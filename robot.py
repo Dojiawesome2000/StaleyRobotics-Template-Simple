@@ -27,7 +27,9 @@ from ctre import *
 from rev import *
 
 class Robot(TimedRobot):
-    def robotInit(self): pass
+    def robotInit(self):
+        self.left_motor = wpilib.TalonSRX(0)
+        self.right_motor = wpilib.TalonSRX(1)
     def robotPeriodic(self): pass
 
     def autonomousInit(self): pass
