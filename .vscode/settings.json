@@ -1,0 +1,4 @@
+{
+    "wpilib.stopSimulationOnEntry": false,
+    "wpilib.selectDefaultSimulateExtension": true,
+}

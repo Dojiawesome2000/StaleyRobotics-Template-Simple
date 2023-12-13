@@ -1,0 +1,19 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DifferentialDrive[1]": "DifferentialDrive",
+      "/LiveWindow/Ungrouped/PWMTalonSRX[0]": "Motor Controller",
+      "/LiveWindow/Ungrouped/PWMTalonSRX[1]": "Motor Controller",
+      "/LiveWindow/Ungrouped/PWMTalonSRX[2]": "Motor Controller",
+      "/LiveWindow/Ungrouped/PWMTalonSRX[3]": "Motor Controller"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
+      }
+    }
+  }
+}
