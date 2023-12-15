@@ -1,16 +1,16 @@
 from wpilib import *
 import wpilib.drive
-from wpimath import *
-from wpimath.controller import *
+import wpimath
+import wpimath.controller
 # from wpimath.estimator import *
 # from wpimath.filter import *
 # from wpimath.geometry import *
 # from wpimath.interpolation import *
-from wpimath.kinematics import *
+import wpimath.kinematics
 # from wpimath.spline import *
 # # from wpimath.system import *
 # from wpimath.trajectory import *
-from wpimath.units import *
+import wpimath.units
 # from wpinet import *
 # from wpiutil import *
 
@@ -23,14 +23,13 @@ from wpimath.units import *
 # from commands2 import *
 # from commands2.button import *
 # from commands2.cmd import *
-
-from ctre import *
+import ctre
 # from rev import *
 
 class Robot(TimedRobot):
     
     MAX_SPEED = 3.0  # meters per second
-    MAX_ANGULAR_SPEED = 2 * math.pi  # one rotation per second
+    MAX_ANGULAR_SPEED = 2 * wpimath.units.math.pi  # one rotation per second
 
     TRACK_WIDTH = 0.381 * 2  # meters
     WHEEL_RADIUS = 0.0508  # meters
@@ -41,21 +40,21 @@ class Robot(TimedRobot):
         This function is called upon program startup and
         should be used for any initialization code.
         """
-        self.frontleft_motor = PWMTalonSRX(0)
-        self.backleft_motor = PWMTalonSRX(1)
-        self.frontright_motor = PWMTalonSRX(2)
-        self.backright_motor = PWMTalonSRX(3)
+        self.frontleft_motor = ctre.WPI_VictorSPX(3)
+        self.backleft_motor = ctre.WPI_VictorSPX(4)
+        self.frontright_motor = ctre.WPI_VictorSPX(1)
+        self.backright_motor = ctre.WPI_VictorSPX(2)
 
-        self.leftEncoder = wpilib.Encoder(0, 1)
-        self.rightEncoder = wpilib.Encoder(2, 3)
+        # self.leftEncoder = wpilib.Encoder(0, 1)
+        # self.rightEncoder = wpilib.Encoder(2, 3)
 
         self.left = MotorControllerGroup(self.frontleft_motor, self.backleft_motor)
         self.right = MotorControllerGroup(self.frontright_motor, self.backright_motor)
 
-        self.gyro = wpilib.AnalogGyro(0)
+        # self.gyro = wpilib.AnalogGyro(0)
 
         # creating my kinematics object: track width of 27 units (idk the actual unit type thingy)
-        self.kinematics = DifferentialDriveKinematics(self.TRACK_WIDTH)
+        self.kinematics = wpimath.kinematics.DifferentialDriveKinematics(self.TRACK_WIDTH)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
@@ -64,22 +63,22 @@ class Robot(TimedRobot):
 
         # Set the distance per pulse for the drive encoders. We can simply use the
         # distance traveled for one rotation of the wheel divided by the encoder
-        # resolution.
-        self.leftEncoder.setDistancePerPulse(
-            2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
-        )
-        self.rightEncoder.setDistancePerPulse(
-            2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
-        )
+        # # resolution.
+        # self.leftEncoder.setDistancePerPulse(
+        #     2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
+        # )
+        # self.rightEncoder.setDistancePerPulse(
+        #     2 * math.pi * self.WHEEL_RADIUS / self.ENCODER_RESOLUTION
+        # )
 
-        self.leftEncoder.reset()
-        self.rightEncoder.reset()
+        # self.leftEncoder.reset()
+        # self.rightEncoder.reset()
 
-        self.odometry = DifferentialDriveOdometry(
-            self.gyro.getRotation2d(),
-            self.leftEncoder.getDistance(),
-            self.rightEncoder.getDistance(),
-        )
+        # self.odometry = DifferentialDriveOdometry(
+        #     self.gyro.getRotation2d(),
+        #     self.leftEncoder.getDistance(),
+        #     self.rightEncoder.getDistance(),
+        # )
 
 
         self.drive = wpilib.drive.DifferentialDrive(self.left, self.right)
@@ -106,14 +105,23 @@ class Robot(TimedRobot):
         self.drive.setSafetyEnabled(True)
     def teleopPeriodic(self):
         """Runs the motors with tank steering"""
-        self.drive.tankDrive(self.controller.getLeftY() * -1, self.controller.getRightY())
+        # movement using left and right joysticks
+        self.drive.tankDrive(self.controller.getLeftY(), self.controller.getRightY())
+
+
+        # SmartDashboard telemetry
         SmartDashboard.putNumber("TalonSRX front left motor power", self.frontleft_motor.get())
-    def teleopExit(self): pass
+        SmartDashboard.putNumber("TalonSRX back left motor power", self.backleft_motor.get())
+        SmartDashboard.putNumber("TalonSRX front right motor power", self.frontright_motor.get())
+        SmartDashboard.putNumber("TalonSRX back right motor power", self.backright_motor.get())
+        SmartDashboard.putBoolean("Robot_status_is_on", True)
+    def teleopExit(self):
+        SmartDashboard.putBoolean("Robot_status_is_on", False)
 
     def _simulationInit(self): pass
     def _simulationPeriodic(self): pass
 
-    def disabledInit(self): pass
+    def disabledInit(self): pas
     def disabledPeriodic(self): pass
     def disabledExit(self): pass
 

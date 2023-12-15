@@ -11,6 +11,12 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Shuffleboard": {
+        ".metadata": {
+          "open": true
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "open": true
       }
