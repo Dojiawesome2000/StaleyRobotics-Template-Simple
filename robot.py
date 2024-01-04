@@ -24,7 +24,7 @@ import wpimath.units
 # from commands2.button import *
 # from commands2.cmd import *
 import ctre
-# from rev import *
+import rev
 
 class Robot(TimedRobot):
     
@@ -45,6 +45,37 @@ class Robot(TimedRobot):
         self.frontright_motor = ctre.WPI_VictorSPX(1)
         self.backright_motor = ctre.WPI_VictorSPX(2)
 
+        #Ball launcher go brrrrrrrrrrrrrrr
+        self.shooter = rev.CANSparkMax(9, rev.CANSparkMax.MotorType.kBrushless)
+
+        #Reset ball launcher for purposes
+        self.shooter.restoreFactoryDefaults()
+
+        #Get PID controller of ball launcher
+        self.shooter_pidController = self.shooter.getPIDController()
+
+        #Get encodeer of ball launcher
+        self.encoder = self.shooter.getEncoder()
+
+        #Set PID coefficients (to be tampered with)
+        self.kP = 6e-5
+        self.kI = 0
+        self.kD = 0 
+        self.kIz = 0
+        self.kFF = 0.000015 
+        self.kMaxOutput = 1 
+        self.kMinOutput = -1
+        self.maxRPM = 5700
+
+        # display PID coefficients on SmartDashboard
+        SmartDashboard.putNumber("P Gain", self.kP)
+        SmartDashboard.putNumber("I Gain", self.kI)
+        SmartDashboard.putNumber("D Gain", self.kD)
+        SmartDashboard.putNumber("I Zone", self.kIz)
+        SmartDashboard.putNumber("Feed Forward", self.kFF)
+        SmartDashboard.putNumber("Max Output", self.kMaxOutput)
+        SmartDashboard.putNumber("Min Output", self.kMinOutput)
+
         # self.leftEncoder = wpilib.Encoder(0, 1)
         # self.rightEncoder = wpilib.Encoder(2, 3)
 
@@ -60,6 +91,8 @@ class Robot(TimedRobot):
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
         self.right.setInverted(True)
+
+        self.shooter.setInverted(True)
 
         # Set the distance per pulse for the drive encoders. We can simply use the
         # distance traveled for one rotation of the wheel divided by the encoder
@@ -108,8 +141,53 @@ class Robot(TimedRobot):
         # movement using left and right joysticks
         self.drive.tankDrive(self.controller.getLeftY(), self.controller.getRightY())
 
+        # # Ball Launcher (open loop)
+        # if self.controller.getAButton(): # corresponds to BButton because its Logitech Dual Action to XboxController
+        #     self.shooter.set(.2)
+        # elif self.controller.getBButton(): # corresponds to XButton because its Logitech Dual Action to XboxController
+        #     self.shooter.set(.4)
+        # elif self.controller.getYButton():
+        #     self.shooter.set(.6)
+        # elif self.controller.getXButton(): # corresponds to AButton because its Logitech Dual Action to XboxController
+        #     self.shooter.set(.8)
+        # elif self.controller.getRightBumper() or self.controller.getLeftBumper():
+        #     self.shooter.set(1)
+        # else:
+        #     self.shooter.set(0)
 
-        # SmartDashboard telemetry
+        # read PID coefficients from SmartDashboard
+        p = SmartDashboard.getNumber("P Gain", 0)
+        i = SmartDashboard.getNumber("I Gain", 0)
+        d = SmartDashboard.getNumber("D Gain", 0)
+        iz = SmartDashboard.getNumber("I Zone", 0)
+        ff = SmartDashboard.getNumber("Feed Forward", 0)
+        max = SmartDashboard.getNumber("Max Output", 0)
+        min = SmartDashboard.getNumber("Min Output", 0)
+
+        # if PID coefficients on SmartDashboard have changed, write new values to controller
+        if((p != kP)):
+            m_pidController.setP(p); self.kP = p
+        if((i != kI)):
+            m_pidController.setI(i); kI = i
+        if((d != kD)):
+            m_pidController.setD(d); kD = d
+        if((iz != kIz)):
+            m_pidController.setIZone(iz); kIz = iz
+        if((ff != kFF)) { m_pidController.setFF(ff); kFF = ff; }
+        if((max != kMaxOutput) || (min != kMinOutput)) { 
+        m_pidController.setOutputRange(min, max); 
+        kMinOutput = min; kMaxOutput = max; 
+        # TODO 
+
+
+
+
+    # SmartDashboard telemetry
+        # SmartDashboard.putBoolean("AButton Status", self.controller.getAButton())
+        # SmartDashboard.putBoolean("BButton Status", self.controller.getBButton())
+        # SmartDashboard.putBoolean("YButton Status", self.controller.getYButton())
+        # SmartDashboard.putBoolean("XButton Status", self.controller.getXButton())
+        # SmartDashboard.putBoolean("Right Bumber Status", self.controller.getRightBumper())
         SmartDashboard.putNumber("TalonSRX front left motor power", self.frontleft_motor.get())
         SmartDashboard.putNumber("TalonSRX back left motor power", self.backleft_motor.get())
         SmartDashboard.putNumber("TalonSRX front right motor power", self.frontright_motor.get())
@@ -121,7 +199,7 @@ class Robot(TimedRobot):
     def _simulationInit(self): pass
     def _simulationPeriodic(self): pass
 
-    def disabledInit(self): pas
+    def disabledInit(self): pass
     def disabledPeriodic(self): pass
     def disabledExit(self): pass
 
