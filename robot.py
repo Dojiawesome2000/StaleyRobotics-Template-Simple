@@ -124,9 +124,6 @@ class Robot(TimedRobot):
 
 
 
-
-
-
     def robotPeriodic(self): pass
 
     def autonomousInit(self): pass
@@ -165,21 +162,25 @@ class Robot(TimedRobot):
         min = SmartDashboard.getNumber("Min Output", 0)
 
         # if PID coefficients on SmartDashboard have changed, write new values to controller
-        if((p != kP)):
-            m_pidController.setP(p); self.kP = p
-        if((i != kI)):
-            m_pidController.setI(i); kI = i
-        if((d != kD)):
-            m_pidController.setD(d); kD = d
-        if((iz != kIz)):
-            m_pidController.setIZone(iz); kIz = iz
-        if((ff != kFF)) { m_pidController.setFF(ff); kFF = ff; }
-        if((max != kMaxOutput) || (min != kMinOutput)) { 
-        m_pidController.setOutputRange(min, max); 
-        kMinOutput = min; kMaxOutput = max; 
-        # TODO 
-
-
+        if((p != self.kP)):
+            self.shooter_pidController.setP(p)
+            self.kP = p
+        if((i != self.kI)):
+            self.shooter_pidController.setI(i)
+            self.kI = i
+        if((d != self.kD)):
+            self.shooter_pidController.setD(d)
+            self.kD = d
+        if((iz != self.kIz)):
+            self.shooter_pidController.setIZone(iz)
+            self.kIz = iz
+        if((ff != self.kFF)):
+            self.shooter_pidController.setFF(ff)
+            self.kFF = ff
+        if((max != self.kMaxOutput) or (min != self.kMinOutput)):
+            self.shooter_pidController.setOutputRange(min, max)
+            self.kMinOutput = min
+            self.kMaxOutput = max; 
 
 
     # SmartDashboard telemetry
